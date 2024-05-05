@@ -48,11 +48,13 @@ class Captcha:
             self.log.error(traceback.format_exc())
             result = (False, "UNKNOWN_ERROR", e)
         else:
+            self.log.info(f"No captcha exception, result to send to callback: {result}")
+            final = (True, "SOLVED", result)
             result_callback(result)
-            result = (True, "SOLVED", result)
         finally:
             self.log.debug_if(debug_enabled, result)
-            return result
+            self.log.info(f"Finally _solve_captcha result: {final}")
+            return final
 
     def save_captcha(self, driver: webdriver, captcha_image_filepath: str):
         captcha_element = selenium_common.is_elem_present(driver, By.ID, "ctl00_ContentPlaceHolder1_CaptchaImg")
