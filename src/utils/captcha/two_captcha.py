@@ -50,7 +50,6 @@ class Captcha:
         else:
             # to enter the captcha
             result_callback(result)
-            result = (True, "SOLVED", result)
         finally:
             self.log.debug_if(debug_enabled, result)
             self.log.info(f"_solve_captcha finally result: {result}")

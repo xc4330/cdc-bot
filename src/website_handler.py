@@ -106,7 +106,6 @@ class handler(CDCAbstract):
         self.log.info(f"before open sleep {preDuration}")
         # self.driver.get(f"{self.booking_url}{self.port}/{path}")
         time.sleep(preDuration)
-
         self.driver.get(f"{self.booking_url}/{path}")
         postDuration = 5 + int.from_bytes(os.urandom(8), byteorder="big") / ((1 << 64) - 1) * 3
         self.log.info(f"after open sleep {postDuration}")
@@ -381,6 +380,7 @@ class handler(CDCAbstract):
         if not self.check_call_depth(call_depth):
             call_depth = 0
         self._open_index("NewPortal/Booking/BookingTT.aspx")
+        self._open_index("NewPortal/Booking/BookingTT.aspx")
 
         if not self.check_access_rights("NewPortal/Booking/BookingTT.aspx"):
             self.log.debug(f"User does not have {field_type.upper()} as an available option.")
@@ -408,6 +408,7 @@ class handler(CDCAbstract):
     def open_practical_lessons_booking_page(self, field_type: str, call_depth: int = 0):
         if not self.check_call_depth(call_depth):
             call_depth = 0
+        self._open_index("NewPortal/Booking/BookingPL.aspx")
         self._open_index("NewPortal/Booking/BookingPL.aspx")
 
         if not self.check_access_rights("NewPortal/Booking/BookingPL.aspx"):
@@ -485,6 +486,7 @@ class handler(CDCAbstract):
         if not self.check_call_depth(call_depth):
             call_depth = 0
         self._open_index("NewPortal/Booking/BookingSimulator.aspx")
+        self._open_index("NewPortal/Booking/BookingSimulator.aspx")
 
         if not self.check_access_rights("NewPortal/Booking/BookingSimulator.aspx"):
             self.log.debug(f"User does not have {field_type.upper()} as an available option.")
@@ -521,6 +523,7 @@ class handler(CDCAbstract):
 
         if not self.check_call_depth(call_depth):
             call_depth = 0
+        self._open_index("NewPortal/Booking/BookingPT.aspx")
         self._open_index("NewPortal/Booking/BookingPT.aspx")
 
         if not self.check_access_rights("NewPortal/Booking/BookingPT.aspx"):
