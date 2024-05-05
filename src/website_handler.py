@@ -9,6 +9,9 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
+from selenium.webdriver.chrome.service import Service
+from selenium_stealth import stealth
+
 
 from abstracts.cdc_abstract import CDCAbstract, Types
 from src.utils.common import selenium_common
@@ -72,14 +75,22 @@ class handler(CDCAbstract):
         driver_name = "geckodriver" if browser_type.lower() == "firefox" else "chromedriver"
         if self.platform == "windows":
             driver_name += ".exe"
-        executable_path = os.path.join("drivers", self.platform, driver_name)
 
+        service = Service(executable_path=os.path.join("drivers", self.platform, driver_name))
         if browser_type.lower() == "firefox":
-            self.driver = webdriver.Firefox(executable_path=executable_path, options=options)
+            self.driver = webdriver.Firefox(service=service, options=options)
         else:
-            self.driver = webdriver.Chrome(executable_path=executable_path, options=options)
+            self.driver = webdriver.Chrome(service=service, options=options)
 
         self.driver.set_window_size(1600, 768)
+        stealth(self.driver,
+            languages=["en-US", "en"],
+            vendor="Google Inc.",
+            platform="Win32",
+            webgl_vendor="Intel Inc.",
+            renderer="Intel Iris OpenGL Engine",
+            fix_hairline=True,
+        )
         super().__init__(username=self.username, password=self.password, headless=headless)
 
     def __enter__(self):
@@ -89,6 +100,7 @@ class handler(CDCAbstract):
         self.driver.close()
 
     def _open_index(self, path: str, sleep_delay=None):
+        self.log.info(f"opening {self.booking_url}/{path}")
         self.driver.get(f"{self.booking_url}{self.port}/{path}")
         if sleep_delay:
             time.sleep(sleep_delay)
@@ -244,18 +256,18 @@ class handler(CDCAbstract):
     def account_login(self):
         self.open_home_page(sleep_delay=2)
 
-        prompt_login_btn = selenium_common.wait_for_elem(self.driver, By.XPATH, "//*[@id='top-menu']/ul/li[10]/a")
+        prompt_login_btn = selenium_common.wait_for_elem(self.driver, By.XPATH, "//*[@id='login']/div/div/span")
         prompt_login_btn.click()
 
-        learner_id_input = selenium_common.wait_for_elem(self.driver, By.NAME, "userId")
-        password_input = selenium_common.wait_for_elem(self.driver, By.NAME, "password")
+        learner_id_input = selenium_common.wait_for_elem(self.driver, By.NAME, "userId_4")
+        password_input = selenium_common.wait_for_elem(self.driver, By.NAME, "password_4")
 
         learner_id_input.send_keys(self.username)
         password_input.send_keys(self.password)
 
         success, _ = self.captcha_solver.solve(driver=self.driver, captcha_type="recaptcha_v2")
         if success:
-            login_btn = selenium_common.wait_for_elem(self.driver, By.ID, "BTNSERVICE2")
+            login_btn = selenium_common.wait_for_elem(self.driver, By.XPATH, "//*[@id='login-form']/div[4]/input")
             login_btn.click()
 
             _, alert_text = selenium_common.dismiss_alert(driver=self.driver, timeout=5)

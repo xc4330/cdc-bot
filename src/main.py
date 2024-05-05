@@ -93,7 +93,7 @@ if __name__ == "__main__":
                 if not program_config["auto_restart"]:
                     break
 
-                sleep_duration = datetime.timedelta(hours=1)
+                sleep_duration = datetime.timedelta(minutes=3)
                 message = f"Program restarting in {sleep_duration} at {datetime.datetime.now() + sleep_duration}..."
                 notification_manager.send_notification_all(title="", msg=message)
                 log.info(message +
