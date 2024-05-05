@@ -53,6 +53,11 @@ class Captcha:
         finally:
             self.log.debug_if(debug_enabled, result)
             self.log.info(f"_solve_captcha finally result: {result}")
+            # handle unexpected returns
+            if(result["code"] and result["captchaId"]):
+                res = (True, "SOLVED", result)
+                self.log.info(f"_solve_captcha modified result: {res}")
+                return res
             return result
 
     def save_captcha(self, driver: webdriver, captcha_image_filepath: str):

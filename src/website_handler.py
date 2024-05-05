@@ -198,9 +198,16 @@ class handler(CDCAbstract):
             if not success:
                 return False
 
-            self.log.info("captcha solved, submitting...")
             captcha_submit_btn = selenium_common.wait_for_elem(self.driver, By.ID, "ctl00_ContentPlaceHolder1_Button1")
+            duration = 1 + int.from_bytes(os.urandom(8), byteorder="big") / ((1 << 64) - 1) * 3
+            time.sleep(duration)
+            self.log.info("captcha solved, submitting...")
             captcha_submit_btn.click()
+            WebDriverWait(self.driver, 5).until(EC.alert_is_present())
+
+            alert = self.driver.switch_to.alert
+            alert.accept()
+            self.log.info(f"checking page title: {self.driver.title}")
         else:
             captcha_close_btn = selenium_common.wait_for_elem(self.driver, By.CLASS_NAME, "close")
             captcha_close_btn.click()
@@ -380,7 +387,6 @@ class handler(CDCAbstract):
         if not self.check_call_depth(call_depth):
             call_depth = 0
         self._open_index("NewPortal/Booking/BookingTT.aspx")
-        self._open_index("NewPortal/Booking/BookingTT.aspx")
 
         if not self.check_access_rights("NewPortal/Booking/BookingTT.aspx"):
             self.log.debug(f"User does not have {field_type.upper()} as an available option.")
@@ -408,7 +414,6 @@ class handler(CDCAbstract):
     def open_practical_lessons_booking_page(self, field_type: str, call_depth: int = 0):
         if not self.check_call_depth(call_depth):
             call_depth = 0
-        self._open_index("NewPortal/Booking/BookingPL.aspx")
         self._open_index("NewPortal/Booking/BookingPL.aspx")
 
         if not self.check_access_rights("NewPortal/Booking/BookingPL.aspx"):
@@ -486,7 +491,6 @@ class handler(CDCAbstract):
         if not self.check_call_depth(call_depth):
             call_depth = 0
         self._open_index("NewPortal/Booking/BookingSimulator.aspx")
-        self._open_index("NewPortal/Booking/BookingSimulator.aspx")
 
         if not self.check_access_rights("NewPortal/Booking/BookingSimulator.aspx"):
             self.log.debug(f"User does not have {field_type.upper()} as an available option.")
@@ -523,7 +527,6 @@ class handler(CDCAbstract):
 
         if not self.check_call_depth(call_depth):
             call_depth = 0
-        self._open_index("NewPortal/Booking/BookingPT.aspx")
         self._open_index("NewPortal/Booking/BookingPT.aspx")
 
         if not self.check_access_rights("NewPortal/Booking/BookingPT.aspx"):
