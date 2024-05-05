@@ -48,10 +48,12 @@ class Captcha:
             self.log.error(traceback.format_exc())
             result = (False, "UNKNOWN_ERROR", e)
         else:
+            # to enter the captcha
             result_callback(result)
             result = (True, "SOLVED", result)
         finally:
             self.log.debug_if(debug_enabled, result)
+            self.log.info(f"_solve_captcha finally result: {result}")
             return result
 
     def save_captcha(self, driver: webdriver, captcha_image_filepath: str):
@@ -77,6 +79,7 @@ class Captcha:
                 solve_callback=lambda: self.solver.normal(captcha_image_filepath, caseSensitive=1, minLength=6,
                                                           maxLength=6),
                 result_callback=lambda result: captcha_input.send_keys(str(result["code"])),
+                # callback function to enter captcha in the input field
                 debug_enabled=debug_enabled
             )
 

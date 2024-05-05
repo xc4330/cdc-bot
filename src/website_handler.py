@@ -100,19 +100,17 @@ class handler(CDCAbstract):
     def __exit__(self, *args):
         self.driver.close()
 
-    def _open_index(self, path: str, sleep_delay=None):
+    def _open_index(self, path: str):
         self.log.info(f"opening {self.booking_url}/{path}")
-        preDuration = 3 + int.from_bytes(os.urandom(8), byteorder="big") / ((1 << 64) - 1) * 10
+        preDuration = 5 + int.from_bytes(os.urandom(8), byteorder="big") / ((1 << 64) - 1) * 3
         self.log.info(f"before open sleep {preDuration}")
         # self.driver.get(f"{self.booking_url}{self.port}/{path}")
-        if sleep_delay:
-            duration = 3 + int.from_bytes(os.urandom(8), byteorder="big") / ((1 << 64) - 1) * 10
-            self.log.info(f"post open sleep {duration}")
-            time.sleep(duration)
-        self.driver.get(f"{self.booking_url}/{path}")
+        time.sleep(preDuration)
 
-        if sleep_delay:
-            time.sleep(sleep_delay)
+        self.driver.get(f"{self.booking_url}/{path}")
+        postDuration = 5 + int.from_bytes(os.urandom(8), byteorder="big") / ((1 << 64) - 1) * 3
+        self.log.info(f"after open sleep {postDuration}")
+        time.sleep(postDuration)
 
     def __str__(self):
         return super().__str__()
@@ -201,6 +199,7 @@ class handler(CDCAbstract):
             if not success:
                 return False
 
+            self.log.info("captcha solved, submitting...")
             captcha_submit_btn = selenium_common.wait_for_elem(self.driver, By.ID, "ctl00_ContentPlaceHolder1_Button1")
             captcha_submit_btn.click()
         else:
@@ -213,6 +212,7 @@ class handler(CDCAbstract):
             selenium_common.dismiss_alert(driver=self.driver, timeout=secondary_alert_timeout)
             self.log.info(f"Normal captcha failed for opening {caller_identifier} page.")
             return False
+        self.log.info("alert dismissed")
 
         return True
 
@@ -380,7 +380,7 @@ class handler(CDCAbstract):
     def open_theory_test_booking_page(self, field_type: str, call_depth: int = 0):
         if not self.check_call_depth(call_depth):
             call_depth = 0
-        self._open_index("NewPortal/Booking/BookingTT.aspx", sleep_delay=1)
+        self._open_index("NewPortal/Booking/BookingTT.aspx")
 
         if not self.check_access_rights("NewPortal/Booking/BookingTT.aspx"):
             self.log.debug(f"User does not have {field_type.upper()} as an available option.")
@@ -408,7 +408,7 @@ class handler(CDCAbstract):
     def open_practical_lessons_booking_page(self, field_type: str, call_depth: int = 0):
         if not self.check_call_depth(call_depth):
             call_depth = 0
-        self._open_index("NewPortal/Booking/BookingPL.aspx", sleep_delay=1)
+        self._open_index("NewPortal/Booking/BookingPL.aspx")
 
         if not self.check_access_rights("NewPortal/Booking/BookingPL.aspx"):
             self.log.debug(f"User does not have {field_type.upper()} as an available option.")
@@ -429,8 +429,10 @@ class handler(CDCAbstract):
             return False
 
         if not self.dismiss_normal_captcha(caller_identifier="Practical Lessons Booking", solve_captcha=True):
+            self.log.info("dismiss_normal_captcha = FALSE")
             return self.open_practical_lessons_booking_page(field_type, call_depth + 1)
 
+        self.log.info("checking if class is fully booked.")
         time.sleep(2)
         if selenium_common.is_elem_present(self.driver, By.ID, "ctl00_ContentPlaceHolder1_lblFullBookMsg"):
             self.log.info("No available practical lessons currently.")
@@ -482,7 +484,7 @@ class handler(CDCAbstract):
     def open_simulator_lessons_booking_page(self, field_type: str, call_depth: int = 0):
         if not self.check_call_depth(call_depth):
             call_depth = 0
-        self._open_index("NewPortal/Booking/BookingSimulator.aspx", sleep_delay=1)
+        self._open_index("NewPortal/Booking/BookingSimulator.aspx")
 
         if not self.check_access_rights("NewPortal/Booking/BookingSimulator.aspx"):
             self.log.debug(f"User does not have {field_type.upper()} as an available option.")
@@ -519,7 +521,7 @@ class handler(CDCAbstract):
 
         if not self.check_call_depth(call_depth):
             call_depth = 0
-        self._open_index("NewPortal/Booking/BookingPT.aspx", sleep_delay=1)
+        self._open_index("NewPortal/Booking/BookingPT.aspx")
 
         if not self.check_access_rights("NewPortal/Booking/BookingPT.aspx"):
             self.log.debug(f"User does not have {field_type.upper()} as an available option.")
