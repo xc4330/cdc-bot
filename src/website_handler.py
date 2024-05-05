@@ -232,6 +232,7 @@ class handler(CDCAbstract):
         for option_index in range(0, number_of_options):
             option = course_selection.options[option_index]
             course_data["available_courses"].append(str(option.text.strip()))
+            self.log.info(f"available courses: {course_data['available_courses']}")
 
         return course_data
 
@@ -254,6 +255,7 @@ class handler(CDCAbstract):
 
     def open_home_page(self, sleep_delay: Union[int, None] = None):
         self.driver.get(self.home_url)
+        self.log.info(self.driver.title)
         assert "ComfortDelGro" in self.driver.title
 
         if sleep_delay:

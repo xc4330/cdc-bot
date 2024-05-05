@@ -70,14 +70,15 @@ if __name__ == "__main__":
                             f"Program now sleeping for {sleep_duration} till {current_time + sleep_duration}...")
 
                         sleep_duration = sleep_duration.total_seconds()
-                        if sleep_duration > 60:
-                            for i in range(int(sleep_duration / 60)):
-                                cdc_handler.check_logged_in()
-                                time.sleep(60)
-                            time.sleep(sleep_duration % 60)
-                        else:
-                            time.sleep(sleep_duration)
-
+                        # if sleep_duration > 60:
+                            # for i in range(int(sleep_duration / 60)):
+                                # cdc_handler.check_logged_in()
+                                # time.sleep(60)
+                            # time.sleep(sleep_duration % 60)
+                        # else:
+                            # time.sleep(sleep_duration)
+                        time.sleep(sleep_duration)
+                        cdc_handler.check_logged_in()
                         cdc_handler.log.info(f"Program now resuming! Cached log in ?: {cdc_handler.logged_in}")
                     else:
                         break
@@ -93,7 +94,8 @@ if __name__ == "__main__":
                 if not program_config["auto_restart"]:
                     break
 
-                sleep_duration = datetime.timedelta(minutes=3)
+                # restart in the case of an error
+                sleep_duration = datetime.timedelta(minutes=5)
                 message = f"Program restarting in {sleep_duration} at {datetime.datetime.now() + sleep_duration}..."
                 notification_manager.send_notification_all(title="", msg=message)
                 log.info(message +
