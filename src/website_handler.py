@@ -34,7 +34,7 @@ class handler(CDCAbstract):
             log.error("Invalid browser_type was given!")
             raise Exception("Invalid BROWSER_TYPE")
 
-        self.home_url = "https://www.cdc.com.sg"
+        self.home_url = "https://www.cdc.com.sg/news/detail/116-Internal%20Evaluation%20for%20Private%20Learners#"
         #self.booking_url = "https://bookingportal.cdc.com.sg:"
         self.booking_url = "https://bookingportal.cdc.com.sg"
         #self.port = ""
@@ -102,7 +102,13 @@ class handler(CDCAbstract):
 
     def _open_index(self, path: str, sleep_delay=None):
         self.log.info(f"opening {self.booking_url}/{path}")
+        preDuration = 3 + int.from_bytes(os.urandom(8), byteorder="big") / ((1 << 64) - 1) * 10
+        self.log.info(f"before open sleep {preDuration}")
         # self.driver.get(f"{self.booking_url}{self.port}/{path}")
+        if sleep_delay:
+            duration = 3 + int.from_bytes(os.urandom(8), byteorder="big") / ((1 << 64) - 1) * 10
+            self.log.info(f"post open sleep {duration}")
+            time.sleep(duration)
         self.driver.get(f"{self.booking_url}/{path}")
 
         if sleep_delay:
