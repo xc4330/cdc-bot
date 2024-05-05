@@ -35,8 +35,9 @@ class handler(CDCAbstract):
             raise Exception("Invalid BROWSER_TYPE")
 
         self.home_url = "https://www.cdc.com.sg"
-        self.booking_url = "https://bookingportal.cdc.com.sg:"
-        self.port = ""
+        #self.booking_url = "https://bookingportal.cdc.com.sg:"
+        self.booking_url = "https://bookingportal.cdc.com.sg"
+        #self.port = ""
 
         self.captcha_solver = captcha_solver
         self.log = log
@@ -101,7 +102,9 @@ class handler(CDCAbstract):
 
     def _open_index(self, path: str, sleep_delay=None):
         self.log.info(f"opening {self.booking_url}/{path}")
-        self.driver.get(f"{self.booking_url}{self.port}/{path}")
+        # self.driver.get(f"{self.booking_url}{self.port}/{path}")
+        self.driver.get(f"{self.booking_url}/{path}")
+
         if sleep_delay:
             time.sleep(sleep_delay)
 
@@ -170,9 +173,12 @@ class handler(CDCAbstract):
 
     def check_logged_in(self):
         self._open_index("NewPortal/Booking/StatementBooking.aspx")
-        if self.port not in self.driver.current_url:
-            self.log.info("User has been timed out! Now logging out and in again...")
-            self.account_logout()
+        # when user is logged out, they will be redirected to the home page
+        # if self.port not in self.driver.current_url:
+        if self.home_url == self.driver.current_url:
+            # self.log.info("User has been timed out! Now logging out and in again...")
+            # self.account_logout()
+            self.log.info("User has been logged out! Now logging in again...")
             self.account_login()
             time.sleep(0.5)
 
@@ -277,6 +283,9 @@ class handler(CDCAbstract):
                 time.sleep(1)
                 return self.account_login()
             else:
+                self.logged_in = True
+                return True
+                # remove port check
                 url_digits = re.findall(r'\d+', self.driver.current_url)
                 if len(url_digits) > 0:
                     self.port = str(url_digits[-1])
