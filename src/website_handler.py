@@ -203,21 +203,21 @@ class handler(CDCAbstract):
             time.sleep(duration)
             self.log.info("captcha solved, submitting...")
             captcha_submit_btn.click()
-            WebDriverWait(self.driver, 5).until(EC.alert_is_present())
-
-            alert = self.driver.switch_to.alert
-            alert.accept()
             self.log.info(f"checking page title: {self.driver.title}")
         else:
             captcha_close_btn = selenium_common.wait_for_elem(self.driver, By.CLASS_NAME, "close")
             captcha_close_btn.click()
 
         # dismiss alert if found
+        WebDriverWait(self.driver, 5).until(EC.alert_is_present())            
         _, alert_text = selenium_common.dismiss_alert(driver=self.driver, timeout=2)
         if "incorrect captcha" in alert_text:
             selenium_common.dismiss_alert(driver=self.driver, timeout=secondary_alert_timeout)
             self.log.info(f"Normal captcha failed for opening {caller_identifier} page.")
             return False
+        self.log.info(f"alert_text: {alert_text}")
+        alert = self.driver.switch_to.alert
+        alert.accept()
         self.log.info("alert dismissed")
 
         return True
