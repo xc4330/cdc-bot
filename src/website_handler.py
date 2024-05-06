@@ -102,12 +102,12 @@ class handler(CDCAbstract):
 
     def _open_index(self, path: str):
         self.log.info(f"opening {self.booking_url}/{path}")
-        preDuration = 5 + int.from_bytes(os.urandom(8), byteorder="big") / ((1 << 64) - 1) * 3
+        preDuration = 1 + int.from_bytes(os.urandom(8), byteorder="big") / ((1 << 64) - 1) * 3
         self.log.info(f"before open sleep {preDuration}")
         # self.driver.get(f"{self.booking_url}{self.port}/{path}")
         time.sleep(preDuration)
         self.driver.get(f"{self.booking_url}/{path}")
-        postDuration = 5 + int.from_bytes(os.urandom(8), byteorder="big") / ((1 << 64) - 1) * 3
+        postDuration = 1 + int.from_bytes(os.urandom(8), byteorder="big") / ((1 << 64) - 1) * 3
         self.log.info(f"after open sleep {postDuration}")
         time.sleep(postDuration)
 
@@ -203,21 +203,19 @@ class handler(CDCAbstract):
             time.sleep(duration)
             self.log.info("captcha solved, submitting...")
             captcha_submit_btn.click()
-            self.log.info(f"checking page title: {self.driver.title}")
         else:
             captcha_close_btn = selenium_common.wait_for_elem(self.driver, By.CLASS_NAME, "close")
             captcha_close_btn.click()
 
         # dismiss alert if found
-        WebDriverWait(self.driver, 5).until(EC.alert_is_present())            
-        _, alert_text = selenium_common.dismiss_alert(driver=self.driver, timeout=2)
-        if "incorrect captcha" in alert_text:
-            selenium_common.dismiss_alert(driver=self.driver, timeout=secondary_alert_timeout)
-            self.log.info(f"Normal captcha failed for opening {caller_identifier} page.")
-            return False
-        self.log.info(f"alert_text: {alert_text}")
+        WebDriverWait(self.driver, 5).until(EC.alert_is_present())
         alert = self.driver.switch_to.alert
+        self.log.info(f"alert_text: {alert.text}")      
         alert.accept()
+        # _, alert_text = selenium_common.dismiss_alert(driver=self.driver, timeout=3)
+        # self.log.info(f"alert_text: {alert_text}")
+        #alert = self.driver.switch_to.alert
+        #alert.accept()
         self.log.info("alert dismissed")
 
         return True
@@ -231,6 +229,7 @@ class handler(CDCAbstract):
             agree_btn.click()
 
     def get_course_data(self, course_element_id: Union[str, None] = None):
+        self.log.info("get_course_data")
         course = selenium_common.is_elem_present(self.driver, By.ID, course_element_id or
                                                  "ctl00_ContentPlaceHolder1_ddlCourse")
         if not course:
