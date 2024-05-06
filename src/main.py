@@ -95,7 +95,7 @@ if __name__ == "__main__":
                     break
 
                 # restart in the case of an error
-                sleep_duration = datetime.timedelta(minutes=15)
+                sleep_duration = datetime.timedelta(minutes=10)
                 message = f"Program restarting in {sleep_duration} at {datetime.datetime.now() + sleep_duration}..."
                 notification_manager.send_notification_all(title="", msg=message)
                 log.info(message +

@@ -211,11 +211,12 @@ class handler(CDCAbstract):
         WebDriverWait(self.driver, 5).until(EC.alert_is_present())
         alert = self.driver.switch_to.alert
         self.log.info(f"alert_text: {alert.text}")      
+        if "incorrect captcha" in alert.text:
+            self.log.info(f"Normal captcha failed for opening {caller_identifier} page.")
+            alert.accept()
+            self.log.info("alert dismissed")
+            return False
         alert.accept()
-        # _, alert_text = selenium_common.dismiss_alert(driver=self.driver, timeout=3)
-        # self.log.info(f"alert_text: {alert_text}")
-        #alert = self.driver.switch_to.alert
-        #alert.accept()
         self.log.info("alert dismissed")
 
         return True
